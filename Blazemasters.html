@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlazeMasters</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/jpg" href="/retro-favicon.jpg">
+    <script src="https://cdn.jsdelivr.net/npm/vue@3"></script>
+</head>
+<body>
+<div id="app">
+    <div class="snowflakes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <h1>SECRET SANTA!🎄</h1>
+    <div v-if="participants.length > 0">
+        <h2>Participants⛄</h2>
+        <ul>
+            <li v-for="participant in participants" :key="participant.id">{{ participant.name }}</li>
+        </ul>
+        <button @click="shuffle">Giving gifts away!</button>
+        <h2>Here the results!🎉</h2>
+        <ul>
+            <li v-for="result in results" :key="result.id">
+                {{ result.giver.name }} ➡ {{ result.receiver.name }}
+            </li>
+        </ul>
+    </div>
+    <div>
+        <label id="participants" for="participantsInput">Enter the participants (separated by commas):</label>
+        <input type="text" id="participantsInput" v-model="participantsInput">
+        <button @click="addParticipants">Add participants</button>
+    </div>
+</div>
+</body>
+<script>
+      const app = Vue.createApp({
+        data() {
+            return {
+                participants: [],
+                participantsInput: '',
+                results: []
+            };
+        },
+        methods: {
+            addParticipants() {
+                const names = this.participantsInput.split(',').map(name => name.trim());
+                names.forEach(name => {
+                    if (name) {
+                        this.participants.push({ id: Date.now(), name });
+                    }
+                });
+                this.participantsInput = '';
+            },
+            shuffle() {
+                // Algoritmo para asignar destinatarios de manera aleatoria
+                const shuffledParticipants = [...this.participants];
+                for (let i = shuffledParticipants.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffledParticipants[i], shuffledParticipants[j]] = [shuffledParticipants[j], shuffledParticipants[i]];
+                }
+
+                // Asignar destinatarios
+                this.results = shuffledParticipants.map((giver, index) => ({
+                    id: giver.id,
+                    giver,
+                    receiver: shuffledParticipants[(index + 1) % shuffledParticipants.length]
+                }));
+            }
+        }
+    });
+
+    app.mount('#app');
+</script>
+</html>
