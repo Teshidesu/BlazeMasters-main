@@ -1,3 +1,27 @@
+/**
+ * @typedef {{
+ *  id: number
+ *  giver: Participant
+ *  receiver: Participant
+ * }} ScretSanta
+ * 
+ * @typedef {{
+ *  id: number
+ *  name: string
+ * }} Participant
+ */
+
+/**
+ * @param {number} minInclusive 
+ * @param {number} maxInclusive 
+ * @returns {number}
+ */
+function RandomInt(minInclusive, maxInclusive){
+  return Math.floor(
+    Math.random() * (maxInclusive - minInclusive + 1)
+  ) + minInclusive;
+}
+
 const app = Vue.createApp({
   data() {
     return {
@@ -16,20 +40,45 @@ const app = Vue.createApp({
       });
       this.participantsInput = '';
     },
+  
+    // Algoritmo para asignar destinatarios de manera aleatoria
     shuffle() {
-      // Algoritmo para asignar destinatarios de manera aleatoria
-      const shuffledParticipants = [...this.participants];
-      for (let i = shuffledParticipants.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffledParticipants[i], shuffledParticipants[j]] = [shuffledParticipants[j], shuffledParticipants[i]];
+      /**@type {ScretSanta[]} */
+      const results = [];
+      /**@type {Participant[]} */
+      const givers = [...this.participants];
+      /**@type {Participant[]} */
+      const receivers = [...this.participants];
+
+      for(let i = 0; givers.length > 0; ++i){
+        const giver = givers[0];
+  
+        const holderIndex = receivers.indexOf(giver);
+        let giverHolder = null;
+        if(holderIndex > -1){
+          giverHolder = receivers[holderIndex];
+          receivers.splice(holderIndex, 1);
+        }
+        const receiverIndex = RandomInt(0, receivers.length-1);
+
+        const receiver = receivers[receiverIndex];
+
+        results.push({
+          giver,
+          receiver,
+          id: giver.id
+        });
+
+        givers.shift();
+        receivers.splice(receiverIndex, 1);
+        if(giverHolder != null){
+          receivers.push(giverHolder);
+        }
       }
+      console.log("Hola mundo")
 
       // Asignar destinatarios
-      this.results = shuffledParticipants.map((giver, index) => ({
-        id: giver.id,
-        giver,
-        receiver: shuffledParticipants[(index + 1) % shuffledParticipants.length]
-      }));
+      this.results = results;
     }
   }
 });
